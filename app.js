@@ -39,6 +39,7 @@ app.get('/profile', user.profile);
 app.get('/modify/:id', user.modify);
 app.get('/message/:id', user.message);
 app.post('/apis/login', user.login);
+app.post('/apis/add', user.add);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

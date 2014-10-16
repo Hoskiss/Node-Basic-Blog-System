@@ -20,3 +20,14 @@ block content
 
   div(style='padding:50px;')
     h1= title
+
+  for article in blogs
+    div
+      div(style='float:left';margin-top:10px;)= article.Username
+      div(style='float:left';margin-top:10px;)= article.CreateDate
+      br
+      div(style='clear:both')= article.Article
+        a(href='/message/'+article.id, style='float:right;
+        margin-top:105px; margin-right:20px;') Leave a message
+      hr(style='margin-top:110px;')
+

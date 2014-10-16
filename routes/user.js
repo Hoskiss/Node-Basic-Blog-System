@@ -45,7 +45,32 @@ exports.profile = function(req, res){
 };
 
 exports.add_article = function(req, res){
-    res.send("This is the add_article page.");
+    if ((!req.session.name) || (!req.session.logined)) {
+        res.redirect("/");
+        return;
+    }
+    res.locals.username = req.session.name;
+    res.locals.authenticated = req.session.logined;
+    res.render('users/add_article');
+};
+
+exports.add = function(req, res){
+    if (!req.session.name) {
+        res.redirect("/");
+        return;
+    }
+    new Blog({
+        Username: req.session.name,
+        Article: req.body.Content,
+        CreateDate: Date.now()
+    }).save( function(err) {
+        if (err) {
+            console.log("Fail to save to DB.");
+            return;
+        }
+        console.log('Save to DB.');
+    });
+    res.redirect('/');
 };
 
 exports.modify = function(req, res){
