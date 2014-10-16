@@ -1,3 +1,7 @@
+var mongoose = require('mongoose');
+var Blog = mongoose.model('Blog');
+var Comment = mongoose.model('Comment');
+
 /* GET users listing. */
 
 exports.list = function(req, res){
