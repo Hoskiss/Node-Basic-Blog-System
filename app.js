@@ -40,6 +40,9 @@ app.get('/modify/:id', user.modify);
 app.get('/message/:id', user.message);
 app.post('/apis/login', user.login);
 app.post('/apis/add', user.add);
+app.post('/apis/delete/:id', user.del_article);
+app.post('/apis/update/:id', user.update);
+app.post('/apis/comment/:id', user.comment);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

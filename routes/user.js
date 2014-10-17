@@ -41,7 +41,71 @@ exports.forget = function(req, res){
 };
 
 exports.profile = function(req, res){
-    res.send("This is the profile page.");
+    if ((!req.session.name) || (!req.session.logined)) {
+        res.redirect("/");
+        return;
+    }
+    res.locals.username = req.session.name;
+    res.locals.authenticated = req.session.logined;
+    Blog.find(
+        {Username: req.session.name},
+        function(err, blogs, count) {
+            res.render('users/profile', {
+                title: 'Blog System',
+                blogs: blogs
+            });
+        }
+    );
+};
+
+exports.del_article = function(req, res){
+    Blog.remove(
+        {_id: req.params.id},
+        function(err) {
+            if(err) {
+                console.log('Fail to delete article.');
+            } else {
+                console.log('Done');
+            }
+        });
+
+    res.redirect('profile');
+};
+
+exports.modify = function(req, res){
+    if ((!req.session.name) || (!req.session.logined)) {
+        res.redirect("/");
+        return;
+    }
+    res.locals.username = req.session.name;
+    res.locals.authenticated = req.session.logined;
+    res.locals.messageID = req.params.id;
+    Blog.find(
+        {_id: req.params.id},
+        function(err, blogs, count) {
+            res.render('users/modify', {
+                blogs: blogs
+            });
+        });
+};
+
+exports.update = function(req, res){
+    if ((!req.session.name) || (!req.session.logined)) {
+        res.redirect("/");
+        return;
+    }
+    Blog.update(
+        {_id: req.params.id},
+        {Article: req.body.Content},
+        function(err) {
+            if(err) {
+                console.log('Fail to update article.');
+            } else {
+                console.log('Done');
+            }
+        });
+
+    res.redirect('profile');
 };
 
 exports.add_article = function(req, res){
@@ -73,12 +137,43 @@ exports.add = function(req, res){
     res.redirect('/');
 };
 
-exports.modify = function(req, res){
-    res.send("This is the modify page.");
+exports.message = function(req, res){
+    res.locals.username = req.session.name;
+    res.locals.authenticated = req.session.logined;
+    res.locals.messageID = req.params.id;
+    Blog.find(
+        {_id: req.params.id},
+        function(err, blogs, count) {
+            Comment.find(
+                {messageID: req.params.id},
+                function(err, comments, count) {
+                    res.render('users/message', {
+                        blogs: blogs,
+                        comments: comments
+                    });
+                });
+        });
 };
 
-exports.message = function(req, res){
-    res.send("This is the message page.");
+exports.comment = function(req, res){
+    if(!req.body.id) {
+        res.redirect('/');
+        return;
+    }
+    new Comment({
+        Visitor: req.body.Visitor,
+        Comment: req.body.Comment,
+        MessageID: req.params.id,
+        CreateDate: Date.now()
+    }).save( function(err) {
+        if(err) {
+            console.log('Fail to save to DB.');
+            return;
+        }
+        console.log('Save to DB.');
+    });
+
+    res.redirect('/message/'+req.params.id);
 };
 
 exports.login = function(req, res){
@@ -90,5 +185,5 @@ exports.login = function(req, res){
     req.session.name = req.body.user;
     req.session.passwd = req.body.passwd;
     req.session.logined = true;
-    req.redirect('/');
+    res.redirect('/');
 };
